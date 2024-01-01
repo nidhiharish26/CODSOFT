@@ -1,53 +1,83 @@
-#Random password generator
+#To-Do List
 
 from tkinter import *
-from random import *
-from tkinter import messagebox
 
 obj = Tk()
-obj.geometry("400x500")
-obj.title("Password generator")
+obj.title("To-Do List")
+obj.geometry("500x600+400+100")
+obj.configure(bg="#fff3e0")
+obj.resizable(False, False)
 
-#chr to convert the number into an ascii character
+#img = PhotoImage(file=r"C:\Users\NIDHI HARISH K\PycharmProjects\pythonProject\toDoList\image\to_do_bg.jpg")
+#Label(obj, image=img).pack()
 
-def new_password():
-    gen_password.delete(0, END)
-    pw_length = int(entry.get())
-    my_password = ''
-    for x in range(0, pw_length):
-        my_password += chr(randint(33, 126))
-    gen_password.insert(0, my_password)
+task_list = []
 
-def accept():
-    messagebox.showinfo("Password generator", "Password accepted.")
+def addTask():
+    task = entry.get()
+    entry.delete(0, END)
+    if task:
+        with open(r"C:\Users\NIDHI HARISH K\OneDrive\Desktop\tasklist.txt.txt", 'a') as taskfile:
+            taskfile.write(f"\n{task}")
+        task_list.append(task)
+        listbox.insert(END, task)
 
-name = LabelFrame(obj, text="Enter your name")
-name.pack(pady=10)
+def deleteTask():
+    global task_list
+    task = str(listbox.get(ANCHOR))
+    if task in task_list:
+        task_list.remove(task)
+        with open(r"C:\Users\NIDHI HARISH K\OneDrive\Desktop\tasklist.txt.txt", 'w') as tasky:
+            for task in task_list:
+                tasky.write(task+"\n")
+        listbox.delete(ANCHOR)
 
-#entrybox for username entry
-name_entry = Entry(name, font=("Arial", 20))
-name_entry.pack(pady=20, padx=20)
 
-frame = LabelFrame(obj, text="Number of characters")
-frame.pack(pady=5)
+def openTaskFile():
+    try:
+        global task_list
+        with open(r"C:\Users\NIDHI HARISH K\OneDrive\Desktop\tasklist.txt.txt", "r") as taskfile:
+            tasks = taskfile.readlines()
+        for task in tasks:
+            if task != '\n':
+                task_list.append(task)
+                listbox.insert(END, task)
+    except:
+        file=open(r"C:\Users\NIDHI HARISH K\OneDrive\Desktop\tasklist.txt.txt", "w")
+        file.close()
 
-#entry box to designate number of characters
-entry = Entry(frame, font=("Calibre", 20))
-entry.pack(pady=20, padx=20)
 
-#entry box for our returned password
-gen_password = Entry(obj, font=("Calibre", 20), bd=0)
-gen_password.pack(pady=20)
+Label(obj, text="To-Do List", font="Cambria 30 italic", fg="#ff9800", bg="#fff3e0").place(x=170, y=30)
+Label(obj, text="All tasks", font="Cambria 20 italic", fg="black", bg="#fff3e0").place(x=210, y=100)
 
-#frame for buttons
-button_frame = Frame(obj)
-button_frame.pack(pady=20)
+frame = Frame(obj, width=500, height=50, bg="white")
+frame.place(x=0, y=180)
 
-#creating buttons
-my_button = Button(button_frame, text="Generate strong password", bg="#5c6bc0", fg="white", font="Arial 10", command=new_password)
-my_button.grid(row=0, column=1, padx=10)
+task = StringVar()
+entry = Entry(frame, width=18, font="arial 15", bd=0)
+entry.place(x=10, y=7)
+entry.focus()
 
-accept_button = Button(button_frame, text="Accept", bg="#5c6bc0", fg="white", font="Arial 10", command=accept)
-accept_button.grid(row=1, column=1, padx=10, pady=10)
+button = Button(frame, text="ADD", font="arial 15 bold", width=5, bg="#e65100", fg="#fff", bd=3, command=addTask)
+button.place(x=429, y=0)
+
+frame1 = Frame(obj, bd=3, width=100, height=280, bg="white")
+frame1.pack(pady=(230, 100))
+
+listbox = Listbox(frame1, font=('arial', 12), width=52, height=16, bg="white", fg="#000000", cursor="hand2", selectbackground="#5a95ff")
+listbox.pack(side=LEFT, fill=BOTH, padx=2)
+scrollbar = Scrollbar(frame1)
+scrollbar.pack(side=RIGHT, fill=BOTH)
+
+listbox.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=listbox.yview)
+
+openTaskFile()
+
+#delete_icon = PhotoImage(file=r"C:\Users\NIDHI HARISH K\OneDrive\Desktop\delete_icon.png")
+#delete_icon.configure(height=50, width=50)
+delete_button = Button(obj, text="DELETE", font="arial 10 bold", width=10, bg="#ff1744", fg="#fff", bd=3, command=deleteTask)
+delete_button.place(x=210, y=520)
+#Button(obj, image=delete_icon, bd=0).pack(side=BOTTOM, pady=13)
 
 obj.mainloop()
